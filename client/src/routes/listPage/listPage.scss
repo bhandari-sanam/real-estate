@@ -5,10 +5,11 @@
   height: 100%;
 
   .listContainer {
-    flex: 3;
+    flex: 1;
     height: 100%;
+    padding: 20px;
 
-    .wrapper{
+    .wrapper {
       height: 100%;
       padding-right: 50px;
       display: flex;
@@ -16,14 +17,34 @@
       gap: 50px;
       overflow-y: scroll;
       padding-bottom: 50px;
+      max-width: 1200px;
+      margin: 0 auto;
+
+      .sortOptions {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+
+        label {
+          margin-right: 10px;
+        }
+
+        select {
+          padding: 5px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+        }
+      }
     }
   }
+
   .mapContainer {
-    flex: 2;
+    flex: 1;
     height: 100%;
     background-color: #fcf5f3;
+    position: relative;
 
-    @include md{
+    @include md {
       display: none;
     }
   }

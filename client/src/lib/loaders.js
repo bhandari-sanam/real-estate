@@ -15,9 +15,20 @@ export const listPageLoader = async ({ request, params }) => {
 
 export const profilePageLoader = async () => {
   const postPromise = apiRequest("/users/profilePosts");
-  const chatPromise = apiRequest("/chats");
   return defer({
     postResponse: postPromise,
-    chatResponse: chatPromise,
   });
+};
+
+export const agentPageLoader = async () => {
+  const response = await apiRequest.get("/users");
+  return response.data;
+};
+
+export const agentDetailPageLoader = async ({ params }) => {
+  const agentResponse = await apiRequest.get(`/users/${params.id}`);
+  return {
+    agent: agentResponse.data.user,
+    posts: agentResponse.data.posts,
+  };
 };

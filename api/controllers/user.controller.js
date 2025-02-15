@@ -3,11 +3,18 @@ import bcrypt from "bcrypt";
 
 export const getUsers = async (req, res) => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        avatar: true,
+      },
+    });
     res.status(200).json(users);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to get users!" });
+    res.status(500).json({ message: "Failed to get users" });
   }
 };
 
@@ -152,5 +159,33 @@ export const getNotificationNumber = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to get profile posts!" });
+  }
+};
+
+export const getUserWithPosts = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        avatar: true,
+      },
+    });
+
+    const posts = await prisma.post.findMany({
+      where: { userId: id },
+      include: {
+        postDetail: true,
+        user: true,
+      },
+    });
+
+    res.status(200).json({ user, posts });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to get user and posts" });
   }
 };

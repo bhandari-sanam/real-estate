@@ -1,7 +1,31 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState, useEffect } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import "./card.scss";
 
-function Card({ item }) {
+function Card({ item, onDelete, onSave }) {
+  const { currentUser } = useContext(AuthContext);
+  const [saved, setSaved] = useState(item.isSaved);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setSaved(item.isSaved);
+  }, [item.isSaved]);
+
+  const handleSave = async () => {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+    setSaved((prev) => !prev);
+    try {
+      await onSave(item.id, saved);
+    } catch (err) {
+      console.log(err);
+      setSaved((prev) => !prev);
+    }
+  };
+
   return (
     <div className="card">
       <Link to={`/${item.id}`} className="imageContainer">
@@ -28,12 +52,29 @@ function Card({ item }) {
             </div>
           </div>
           <div className="icons">
-            <div className="icon">
-              <img src="/save.png" alt="" />
-            </div>
-            <div className="icon">
-              <img src="/chat.png" alt="" />
-            </div>
+            {item.userId === currentUser.id ? (
+              <>
+                <Link to={`/edit/${item.id}`} className="icon">
+                  <img src="./edit.png" alt="" />
+                  <span>Edit</span>
+                </Link>
+                <button className="icon" onClick={() => onDelete(item.id)}>
+                  <img src="./delete.png" alt="" />
+                  <span>Delete</span>
+                </button>
+              </>
+            ) : (
+              <button
+                className="icon"
+                onClick={handleSave}
+                style={{
+                  backgroundColor: saved ? "#fece51" : "white",
+                }}
+              >
+                <img src="./save.png" alt="" />
+                <span>{saved ? "Saved" : "Save"}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

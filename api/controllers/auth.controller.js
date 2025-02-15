@@ -2,6 +2,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma.js";
 
+import dotenv from 'dotenv';
+dotenv.config();
+
+
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -51,8 +55,7 @@ export const login = async (req, res) => {
 
     // GENERATE COOKIE TOKEN AND SEND TO THE USER
 
-    // res.setHeader("Set-Cookie", "test=" + "myValue").json("success")
-    const age = 1000 * 60 * 60 * 24 * 7;
+     const age = 1000 * 60 * 60 * 24 * 7;
 
     const token = jwt.sign(
       {

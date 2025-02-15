@@ -1,4 +1,3 @@
-import Chat from "../../components/chat/Chat";
 import List from "../../components/list/List";
 import "./profilePage.scss";
 import apiRequest from "../../lib/apiRequest";
@@ -8,9 +7,7 @@ import { AuthContext } from "../../context/AuthContext";
 
 function ProfilePage() {
   const data = useLoaderData();
-
   const { updateUser, currentUser } = useContext(AuthContext);
-
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -22,6 +19,30 @@ function ProfilePage() {
       console.log(err);
     }
   };
+
+  const handleDelete = async (postId) => {
+    console.log(postId);
+    try {
+      await apiRequest.delete(`/posts/${postId}`);
+      navigate(0); // Refresh the page
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleSave = async (postId, isSaved) => {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+    try {
+      await apiRequest.post("/users/save", { postId });
+      navigate(0); // Refresh the page to update the saved status
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="profilePage">
       <div className="details">
@@ -56,7 +77,13 @@ function ProfilePage() {
               resolve={data.postResponse}
               errorElement={<p>Error loading posts!</p>}
             >
-              {(postResponse) => <List posts={postResponse.data.userPosts} />}
+              {(postResponse) => (
+                <List
+                  posts={postResponse.data.userPosts}
+                  onDelete={handleDelete}
+                  onSave={handleSave}
+                />
+              )}
             </Await>
           </Suspense>
           <div className="title">
@@ -67,19 +94,13 @@ function ProfilePage() {
               resolve={data.postResponse}
               errorElement={<p>Error loading posts!</p>}
             >
-              {(postResponse) => <List posts={postResponse.data.savedPosts} />}
-            </Await>
-          </Suspense>
-        </div>
-      </div>
-      <div className="chatContainer">
-        <div className="wrapper">
-          <Suspense fallback={<p>Loading...</p>}>
-            <Await
-              resolve={data.chatResponse}
-              errorElement={<p>Error loading chats!</p>}
-            >
-              {(chatResponse) => <Chat chats={chatResponse.data}/>}
+              {(postResponse) => (
+                <List
+                  posts={postResponse.data.savedPosts}
+                  onDelete={handleDelete}
+                  onSave={handleSave}
+                />
+              )}
             </Await>
           </Suspense>
         </div>

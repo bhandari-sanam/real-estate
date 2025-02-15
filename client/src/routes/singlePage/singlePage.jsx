@@ -3,7 +3,7 @@ import Slider from "../../components/slider/Slider";
 import Map from "../../components/map/Map";
 import { useNavigate, useLoaderData } from "react-router-dom";
 import DOMPurify from "dompurify";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import apiRequest from "../../lib/apiRequest";
 
@@ -13,11 +13,15 @@ function SinglePage() {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    setSaved(post.isSaved);
+  }, [post.isSaved]);
+
   const handleSave = async () => {
     if (!currentUser) {
       navigate("/login");
+      return;
     }
-    // AFTER REACT 19 UPDATE TO USEOPTIMISTIK HOOK
     setSaved((prev) => !prev);
     try {
       await apiRequest.post("/users/save", { postId: post.id });
@@ -40,10 +44,10 @@ function SinglePage() {
                   <img src="/pin.png" alt="" />
                   <span>{post.address}</span>
                 </div>
-                <div className="price">$ {post.price}</div>
+                <div className="price">NPR {post.price}</div>
               </div>
               <div className="user">
-                <img src={post.user.avatar} alt="" />
+                <img src={post.user.avatar || "./noavatar.jpg"} alt="" />
                 <span>{post.user.username}</span>
               </div>
             </div>
@@ -139,10 +143,6 @@ function SinglePage() {
             <Map items={[post]} />
           </div>
           <div className="buttons">
-            <button>
-              <img src="/chat.png" alt="" />
-              Send a Message
-            </button>
             <button
               onClick={handleSave}
               style={{
